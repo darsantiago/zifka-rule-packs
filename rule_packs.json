@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "publishedAt": "2026-07-14T00:00:00Z",
+  "version": 2,
+  "publishedAt": "2026-07-14T18:00:00Z",
   "packs": [
     {
       "id": "us_retirement_2026",
@@ -32,6 +32,14 @@
       "authority": "Corte Constitucional Auto 841/25 · Ley 2381/2024 art. 76",
       "reviewedAt": "2026-07-14T00:00:00Z",
       "validThrough": "2026-07-16T23:59:59Z",
+      "requiresLocalValidation": true
+    },
+    {
+      "id": "mx_tax_payroll_2026",
+      "title": "México — ISR, IMSS y prestaciones 2026 (UMA $117.31 · tabla art. 152)",
+      "authority": "SAT · Anexo 8 RMF (DOF 28-dic-2025) · INEGI UMA 2026",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2026-12-31T23:59:59Z",
       "requiresLocalValidation": true
     },
     {
