@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "publishedAt": "2026-07-14T00:00:00Z",
+  "packs": [
+    {
+      "id": "us_retirement_2026",
+      "title": "US retirement distribution review — 2026",
+      "authority": "IRS",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2026-12-31T23:59:59Z",
+      "requiresLocalValidation": false
+    },
+    {
+      "id": "us_insurance_suitability",
+      "title": "US insurance suitability checklist",
+      "authority": "NAIC model guidance",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2027-01-31T23:59:59Z",
+      "requiresLocalValidation": true
+    },
+    {
+      "id": "co_tax_payroll_2026",
+      "title": "Colombia — renta, seguridad social y nómina 2026 (UVT $52.374, SMMLV $1.750.905)",
+      "authority": "DIAN Res. 000238/2025 · Decretos 1469-1470/2025",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2026-12-31T23:59:59Z",
+      "requiresLocalValidation": true
+    },
+    {
+      "id": "co_pension_transfer_window",
+      "title": "Colombia — ventana de traslado de régimen pensional (art. 76 Ley 2381) VENCE 16-jul-2026",
+      "authority": "Corte Constitucional Auto 841/25 · Ley 2381/2024 art. 76",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2026-07-16T23:59:59Z",
+      "requiresLocalValidation": true
+    },
+    {
+      "id": "privacy_local_records",
+      "title": "Local records and privacy controls",
+      "authority": "Device policy pack",
+      "reviewedAt": "2026-07-14T00:00:00Z",
+      "validThrough": "2027-07-14T23:59:59Z",
+      "requiresLocalValidation": true
+    }
+  ]
+}
