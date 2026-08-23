@@ -1,7 +1,13 @@
 {
   "snapshotDate": "mid-2025",
-  "version": 1,
+  "version": 2,
   "note": "Initial signed pack — same values as the app's embedded snapshot. Future packs must bump snapshotDate + version and be sourced against Damodaran (Jan/Jul) and Kroll Cost of Capital handbook.",
+  "attribution": {
+    "countryRiskPremiums": "Country risk premiums adapted from Aswath Damodaran's Country Default Spreads and Risk Premiums table, NYU Stern School of Business (pages.stern.nyu.edu/~adamodar/). Values are reformatted; interpretations and adjustments are ours. Damodaran's data is published for educational and informational use.",
+    "matureMarket": "Mature-market risk-free rate is the indicative U.S. 10-Year Treasury yield at the snapshot date. Equity risk premium is Damodaran's implied ERP for U.S. equities at that snapshot.",
+    "sizePremiums": "Size premium bands are illustrative — indicative ranges consistent with the Kroll (formerly Duff & Phelps) Cost of Capital Handbook framework. The Handbook itself is a paid publication; values here are our own bands built to model the SAME dimensions and are not the Handbook's proprietary decile figures.",
+    "industryPremiums": "Industry premium hints are illustrative bands consistent with Damodaran's industry beta / unlevered beta tables (pages.stern.nyu.edu/~adamodar/, updated each January). Not a substitute for looking up the target industry's current beta before signing an engagement."
+  },
   "matureMarket": {
     "riskFreeRate": 4.50,
     "equityRiskPremium": 4.60
