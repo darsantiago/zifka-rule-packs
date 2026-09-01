@@ -1,0 +1,4 @@
+# Dart tool artifacts — don't version tool/.dart_tool
+tool/.dart_tool/
+tool/build/
+tool/.packages
