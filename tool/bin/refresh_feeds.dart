@@ -3,8 +3,8 @@ import 'dart:io';
 
 import '../lib/public_data_sources.dart';
 
-/// Assemble the `data_feeds.json` pack from public, license-clean
-/// sources: FRED (US Treasury rates), World Bank (macro), IMF (WEO),
+/// Assemble the `data_feeds.json` pack from selected public sources:
+/// FRED (US Treasury rates), World Bank (macro), IMF (WEO),
 /// SEC EDGAR (US company tickers index).
 ///
 /// Usage:
@@ -17,8 +17,7 @@ import '../lib/public_data_sources.dart';
 /// executes on a weekly cron. The private key comes from GitHub
 /// Actions Secrets and never lands on disk of a shared runner.
 Future<void> main(List<String> args) async {
-  final outputPath =
-      args.isEmpty ? 'data_feeds.json' : args.first;
+  final outputPath = args.isEmpty ? 'data_feeds.json' : args.first;
 
   stdout.writeln('▶ Fetching Federal Reserve series…');
   final fred = FredClient(apiKey: Platform.environment['FRED_API_KEY']);
@@ -46,19 +45,21 @@ Future<void> main(List<String> args) async {
 
   final now = DateTime.now().toUtc();
   final pack = <String, dynamic>{
-    'schemaVersion': 1,
+    'schemaVersion': 2,
     'version': nextVersion,
     'publishedAt': now.toIso8601String(),
     'attribution': {
       'fred':
-          'St Louis Fed FRED series (public domain — US federal government output).',
+          'Federal Reserve Bank of St. Louis FRED; cite FRED and the original series source. Series-specific terms apply.',
       'worldBank':
           'World Bank Open Data (Creative Commons Attribution 4.0 International).',
       'imf':
-          'IMF DataMapper API — © IMF, referenced under fair-use with attribution.',
+          'IMF DataMapper API — © International Monetary Fund. Attribution required; commercial redistribution permission must be confirmed with the IMF.',
       'secEdgar':
-          'SEC EDGAR company tickers — public domain (US federal government output).',
+          'SEC EDGAR company tickers. Cite the SEC; reuse does not imply SEC endorsement.',
     },
+    'usageNotice':
+        'Public-source reference data. Verify source terms, observation periods, and suitability before professional use.',
     'fred': fredData,
     'worldBank': wbData,
     'imf': imfData,
@@ -96,21 +97,49 @@ Future<Map<String, dynamic>> _fetchFred(FredClient fred) async {
     'us3MonthTBill': 'DTB3',
     'usInflationExpectation10Y': 'T10YIE',
     'fedFundsRate': 'FEDFUNDS',
-    'usCoreCpiYoy': 'CPILFESL',
   };
   final out = <String, dynamic>{};
   for (final entry in series.entries) {
     try {
-      final v = await fred.latestValue(entry.value);
+      final observation = await fred.latestObservation(entry.value);
       out[entry.key] = {
         'seriesId': entry.value,
-        'value': v,
+        'value': observation?.value,
+        'period': observation?.period,
       };
-      stdout.writeln('  • ${entry.value} = $v');
+      stdout.writeln(
+        '  • ${entry.value} = ${observation?.value} (${observation?.period})',
+      );
     } catch (e) {
       stderr.writeln('  ! ${entry.value} failed: $e');
-      out[entry.key] = {'seriesId': entry.value, 'value': null};
+      out[entry.key] = {
+        'seriesId': entry.value,
+        'value': null,
+        'period': null,
+      };
     }
+  }
+  const coreCpiSeries = 'CPILFESL';
+  try {
+    final observation = await fred.latestYearOverYearPercent(coreCpiSeries);
+    out['usCoreCpiYoy'] = {
+      'seriesId': coreCpiSeries,
+      'value': observation?.value,
+      'period': observation?.period,
+      'calculation': 'year_over_year_percent',
+    };
+    stdout.writeln(
+      '  • $coreCpiSeries YoY = ${observation?.value} '
+      '(${observation?.period})',
+    );
+  } catch (e) {
+    stderr.writeln('  ! $coreCpiSeries YoY failed: $e');
+    out['usCoreCpiYoy'] = {
+      'seriesId': coreCpiSeries,
+      'value': null,
+      'period': null,
+      'calculation': 'year_over_year_percent',
+    };
   }
   return out;
 }
@@ -130,11 +159,15 @@ Future<Map<String, dynamic>> _fetchWorldBank(WorldBankClient wb) async {
   for (final country in priorityMarkets) {
     final row = <String, dynamic>{};
     for (final entry in indicators.entries) {
-      final v = await wb.latestValue(
+      final observation = await wb.latestObservation(
         countryIso2: country,
         indicator: entry.value,
       );
-      row[entry.key] = {'indicator': entry.value, 'value': v};
+      row[entry.key] = {
+        'indicator': entry.value,
+        'value': observation?.value,
+        'period': observation?.period,
+      };
     }
     out[country] = row;
     stdout.writeln('  • $country done');
@@ -155,15 +188,28 @@ Future<Map<String, dynamic>> _fetchImf(ImfClient imf) async {
   final out = <String, dynamic>{};
   for (final entry in iso3ByIso2.entries) {
     try {
-      final v = await imf.latestValue(
+      final observation = await imf.observationForYear(
         indicator: 'NGDP_RPCH',
         countryIso3: entry.value,
       );
-      out[entry.key] = {'indicator': 'NGDP_RPCH', 'value': v};
-      stdout.writeln('  • ${entry.value} NGDP_RPCH = $v');
+      out[entry.key] = {
+        'indicator': 'NGDP_RPCH',
+        'value': observation?.value,
+        'period': observation?.period,
+        'status': 'estimate_or_forecast',
+      };
+      stdout.writeln(
+        '  • ${entry.value} NGDP_RPCH = ${observation?.value} '
+        '(${observation?.period})',
+      );
     } catch (e) {
       stderr.writeln('  ! ${entry.value} failed: $e');
-      out[entry.key] = {'indicator': 'NGDP_RPCH', 'value': null};
+      out[entry.key] = {
+        'indicator': 'NGDP_RPCH',
+        'value': null,
+        'period': null,
+        'status': 'estimate_or_forecast',
+      };
     }
   }
   return out;

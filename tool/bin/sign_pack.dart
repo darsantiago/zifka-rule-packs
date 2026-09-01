@@ -27,7 +27,8 @@ Future<void> main(List<String> args) async {
 
   final privateKeyBytes = _readPrivateKeyBytes(File(privateKeyPath));
   if (privateKeyBytes == null) {
-    stderr.writeln('Private key at $privateKeyPath is not 32-byte Ed25519 seed.');
+    stderr
+        .writeln('Private key at $privateKeyPath is not 32-byte Ed25519 seed.');
     exitCode = 65;
     return;
   }
