@@ -59,10 +59,14 @@ jobs:
         run: |
           git config user.name  "zifka-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
-          if git diff --quiet -- data_feeds.json data_feeds.json.sig; then
+          git add data_feeds.json data_feeds.json.sig
+          # `git diff --cached --quiet` returns non-zero when there is
+          # anything staged — covers both new (untracked-then-added) and
+          # modified files. Skip the commit only when the staged diff is
+          # empty.
+          if git diff --cached --quiet; then
             echo "No changes to publish."
             exit 0
           fi
-          git add data_feeds.json data_feeds.json.sig
           git commit -m "chore(feeds): weekly refresh $(date -u +%Y-%m-%d)"
           git push
