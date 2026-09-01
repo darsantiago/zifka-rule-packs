@@ -1,0 +1,18 @@
+name: zifka_rule_packs_tool
+description: Dart CLI to refresh + sign the public data packs served from this repo.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  http: ^1.2.0
+  cryptography: ^2.7.0
+  csv: ^6.0.0
+  archive: ^3.6.1
+  args: ^2.5.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^4.0.0

@@ -1,0 +1,68 @@
+name: Refresh public data feeds
+
+# Runs weekly (Monday 07:00 UTC) plus on-demand.
+# Downloads latest values from FRED, World Bank, IMF, SEC EDGAR;
+# rebuilds data_feeds.json; signs it with the Ed25519 private key
+# from Secrets; commits + pushes back to main.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install tool deps
+        working-directory: tool
+        run: dart pub get
+
+      - name: Refresh data_feeds.json
+        working-directory: tool
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: dart run bin/refresh_feeds.dart ../data_feeds.json
+
+      - name: Write private key to a scratch file
+        env:
+          ED25519_PRIVATE_KEY_B64: ${{ secrets.ED25519_PRIVATE_KEY_B64 }}
+        # Writes a temp file the signer reads once, then wipes it.
+        # The key never leaves the runner and never lands in the repo.
+        run: |
+          if [ -z "$ED25519_PRIVATE_KEY_B64" ]; then
+            echo "::error::ED25519_PRIVATE_KEY_B64 secret is missing."
+            exit 1
+          fi
+          umask 077
+          printf "%s" "$ED25519_PRIVATE_KEY_B64" > "$RUNNER_TEMP/ed25519_priv.b64"
+
+      - name: Sign data_feeds.json
+        working-directory: tool
+        run: dart run bin/sign_pack.dart "$RUNNER_TEMP/ed25519_priv.b64" ../data_feeds.json
+
+      - name: Wipe private key from disk
+        if: always()
+        run: rm -f "$RUNNER_TEMP/ed25519_priv.b64"
+
+      - name: Commit + push if changed
+        run: |
+          git config user.name  "zifka-refresh-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git diff --quiet -- data_feeds.json data_feeds.json.sig; then
+            echo "No changes to publish."
+            exit 0
+          fi
+          git add data_feeds.json data_feeds.json.sig
+          git commit -m "chore(feeds): weekly refresh $(date -u +%Y-%m-%d)"
+          git push
