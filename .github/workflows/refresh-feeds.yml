@@ -1,7 +1,8 @@
 name: Refresh public data feeds
 
 # Runs weekly (Monday 07:00 UTC) plus on-demand.
-# Downloads latest values from FRED, World Bank, IMF, SEC EDGAR;
+# Downloads latest values from FRED, World Bank and SEC EDGAR. IMF is included
+# only when commercial redistribution permission has been confirmed.
 # rebuilds data_feeds.json; signs it with the Ed25519 private key
 # from Secrets; commits + pushes back to main.
 
@@ -32,6 +33,7 @@ jobs:
         working-directory: tool
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          IMF_COMMERCIAL_PERMISSION_CONFIRMED: ${{ secrets.IMF_COMMERCIAL_PERMISSION_CONFIRMED }}
         run: dart run bin/refresh_feeds.dart ../data_feeds.json
 
       - name: Write private key to a scratch file

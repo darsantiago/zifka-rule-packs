@@ -4,8 +4,8 @@ import 'dart:io';
 import '../lib/public_data_sources.dart';
 
 /// Assemble the `data_feeds.json` pack from selected public sources:
-/// FRED (US Treasury rates), World Bank (macro), IMF (WEO),
-/// SEC EDGAR (US company tickers index).
+/// FRED (US Treasury rates), World Bank (macro), optional IMF WEO after
+/// commercial permission, and SEC EDGAR (US company tickers index).
 ///
 /// Usage:
 ///   dart run tool/bin/refresh_feeds.dart <output_path>
@@ -29,10 +29,19 @@ Future<void> main(List<String> args) async {
   final wbData = await _fetchWorldBank(wb);
   wb.close();
 
-  stdout.writeln('▶ Fetching IMF WEO forecasts…');
-  final imf = ImfClient();
-  final imfData = await _fetchImf(imf);
-  imf.close();
+  final imfRedistributionApproved =
+      Platform.environment['IMF_COMMERCIAL_PERMISSION_CONFIRMED'] == 'true';
+  Map<String, dynamic> imfData = const {};
+  if (imfRedistributionApproved) {
+    stdout.writeln('▶ Fetching IMF WEO forecasts…');
+    final imf = ImfClient();
+    imfData = await _fetchImf(imf);
+    imf.close();
+  } else {
+    stdout.writeln(
+      '• IMF redistribution disabled pending confirmed commercial permission.',
+    );
+  }
 
   stdout.writeln('▶ Fetching SEC EDGAR company tickers…');
   final edgar = EdgarClient();
@@ -54,7 +63,7 @@ Future<void> main(List<String> args) async {
       'worldBank':
           'World Bank Open Data (Creative Commons Attribution 4.0 International).',
       'imf':
-          'IMF DataMapper API — © International Monetary Fund. Attribution required; commercial redistribution permission must be confirmed with the IMF.',
+          'IMF values are not redistributed in the default pack. Enable only after commercial permission is confirmed with the International Monetary Fund.',
       'secEdgar':
           'SEC EDGAR company tickers. Cite the SEC; reuse does not imply SEC endorsement.',
     },
