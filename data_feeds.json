@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "version": 3,
-  "publishedAt": "2026-09-01T18:09:19.884022Z",
+  "version": 4,
+  "publishedAt": "2026-09-01T18:20:58.666899Z",
   "attribution": {
     "fred": "Federal Reserve Bank of St. Louis FRED; cite FRED and the original series source. Series-specific terms apply.",
     "worldBank": "World Bank Open Data (Creative Commons Attribution 4.0 International).",
-    "imf": "IMF DataMapper API — © International Monetary Fund. Attribution required; commercial redistribution permission must be confirmed with the IMF.",
+    "imf": "IMF values are not redistributed in the default pack. Enable only after commercial permission is confirmed with the International Monetary Fund.",
     "secEdgar": "SEC EDGAR company tickers. Cite the SEC; reuse does not imply SEC endorsement."
   },
   "usageNotice": "Public-source reference data. Verify source terms, observation periods, and suitability before professional use.",
@@ -206,44 +206,7 @@
       }
     }
   },
-  "imf": {
-    "MX": {
-      "indicator": "NGDP_RPCH",
-      "value": 1.6,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    },
-    "BR": {
-      "indicator": "NGDP_RPCH",
-      "value": 1.9,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    },
-    "IN": {
-      "indicator": "NGDP_RPCH",
-      "value": 6.5,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    },
-    "CO": {
-      "indicator": "NGDP_RPCH",
-      "value": 2.3,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    },
-    "NG": {
-      "indicator": "NGDP_RPCH",
-      "value": 4.1,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    },
-    "ID": {
-      "indicator": "NGDP_RPCH",
-      "value": 5.0,
-      "period": "2026",
-      "status": "estimate_or_forecast"
-    }
-  },
+  "imf": {},
   "edgar": {
     "tickerCount": 10391,
     "topTickers": [
