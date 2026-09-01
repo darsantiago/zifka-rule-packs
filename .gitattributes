@@ -1,0 +1,6 @@
+# Detached signatures cover the exact bytes of these generated payloads.
+# Never let a checkout rewrite their line endings.
+rule_packs.json -text
+valuation_pack.json -text
+data_feeds.json -text
+*.sig -text
