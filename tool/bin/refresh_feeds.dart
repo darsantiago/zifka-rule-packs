@@ -85,6 +85,44 @@ Future<void> main(List<String> args) async {
   stdout.writeln('✔ Wrote $outputPath (v$nextVersion, published $now)');
 }
 
+/// Plausibility bands per feed key. An Ed25519 signature proves the pack
+/// came from this pipeline — not that a source API returned a sane number.
+/// A bad point is dropped to `null` (with a log line) instead of shipping,
+/// so one glitch never invalidates the whole weekly pack on the client.
+const Map<String, (double, double)> _plausibleRanges = {
+  // Percent-style series.
+  'us10YearYield': (-2, 40),
+  'us3MonthYield': (-2, 40),
+  'us3MonthTBill': (-2, 40),
+  'usInflationExpectation10Y': (-10, 40),
+  'fedFundsRate': (-2, 40),
+  'usCoreCpiYoy': (-30, 200),
+  'gdpGrowthAnnual': (-60, 100),
+  'inflationCpiYoy': (-30, 1000),
+  'unemploymentPct': (0, 100),
+  'governmentDebtPctGdp': (0, 500),
+  'NGDP_RPCH': (-60, 100),
+  // Absolute USD.
+  'gdpUsdCurrent': (0, 1e15),
+};
+
+double? _sanitize(String key, double? value, {String? context}) {
+  if (value == null) return null;
+  final range = _plausibleRanges[key];
+  final label = context == null ? key : '$context.$key';
+  if (!value.isFinite) {
+    stderr.writeln('  ! $label dropped: non-finite value $value');
+    return null;
+  }
+  if (range != null && (value < range.$1 || value > range.$2)) {
+    stderr.writeln(
+      '  ! $label dropped: $value outside plausible band [${range.$1}, ${range.$2}]',
+    );
+    return null;
+  }
+  return value;
+}
+
 int _readPreviousVersion(String path) {
   final file = File(path);
   if (!file.existsSync()) return 0;
@@ -113,7 +151,7 @@ Future<Map<String, dynamic>> _fetchFred(FredClient fred) async {
       final observation = await fred.latestObservation(entry.value);
       out[entry.key] = {
         'seriesId': entry.value,
-        'value': observation?.value,
+        'value': _sanitize(entry.key, observation?.value),
         'period': observation?.period,
       };
       stdout.writeln(
@@ -133,7 +171,7 @@ Future<Map<String, dynamic>> _fetchFred(FredClient fred) async {
     final observation = await fred.latestYearOverYearPercent(coreCpiSeries);
     out['usCoreCpiYoy'] = {
       'seriesId': coreCpiSeries,
-      'value': observation?.value,
+      'value': _sanitize('usCoreCpiYoy', observation?.value),
       'period': observation?.period,
       'calculation': 'year_over_year_percent',
     };
@@ -174,7 +212,7 @@ Future<Map<String, dynamic>> _fetchWorldBank(WorldBankClient wb) async {
       );
       row[entry.key] = {
         'indicator': entry.value,
-        'value': observation?.value,
+        'value': _sanitize(entry.key, observation?.value, context: country),
         'period': observation?.period,
       };
     }
@@ -203,7 +241,7 @@ Future<Map<String, dynamic>> _fetchImf(ImfClient imf) async {
       );
       out[entry.key] = {
         'indicator': 'NGDP_RPCH',
-        'value': observation?.value,
+        'value': _sanitize('NGDP_RPCH', observation?.value, context: entry.key),
         'period': observation?.period,
         'status': 'estimate_or_forecast',
       };
