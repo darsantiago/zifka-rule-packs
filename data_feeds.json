@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "version": 6,
-  "publishedAt": "2026-09-04T18:43:35.669325Z",
+  "version": 7,
+  "publishedAt": "2026-09-07T07:28:22.597178Z",
   "attribution": {
     "fred": "Federal Reserve Bank of St. Louis FRED; cite FRED and the original series source. Series-specific terms apply.",
     "worldBank": "World Bank Open Data (Creative Commons Attribution 4.0 International).",
@@ -12,23 +12,23 @@
   "fred": {
     "us10YearYield": {
       "seriesId": "DGS10",
-      "value": 4.79,
-      "period": "2026-09-02"
+      "value": 4.77,
+      "period": "2026-09-03"
     },
     "us3MonthYield": {
       "seriesId": "DGS3MO",
-      "value": 3.92,
-      "period": "2026-09-02"
+      "value": 3.89,
+      "period": "2026-09-03"
     },
     "us3MonthTBill": {
       "seriesId": "DTB3",
-      "value": 3.78,
-      "period": "2026-09-02"
+      "value": 3.75,
+      "period": "2026-09-03"
     },
     "usInflationExpectation10Y": {
       "seriesId": "T10YIE",
       "value": 2.35,
-      "period": "2026-09-03"
+      "period": "2026-09-04"
     },
     "fedFundsRate": {
       "seriesId": "FEDFUNDS",
