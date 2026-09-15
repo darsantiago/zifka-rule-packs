@@ -1,47 +1,12 @@
 {
   "schemaVersion": 2,
-  "version": 8,
+  "version": 9,
   "publishedAt": "2026-09-14T07:30:03.699101Z",
   "attribution": {
-    "fred": "Federal Reserve Bank of St. Louis FRED; cite FRED and the original series source. Series-specific terms apply.",
     "worldBank": "World Bank Open Data (Creative Commons Attribution 4.0 International).",
-    "imf": "IMF values are not redistributed in the default pack. Enable only after commercial permission is confirmed with the International Monetary Fund.",
     "secEdgar": "SEC EDGAR company tickers. Cite the SEC; reuse does not imply SEC endorsement."
   },
-  "usageNotice": "Public-source reference data. Verify source terms, observation periods, and suitability before professional use.",
-  "fred": {
-    "us10YearYield": {
-      "seriesId": "DGS10",
-      "value": 4.95,
-      "period": "2026-09-10"
-    },
-    "us3MonthYield": {
-      "seriesId": "DGS3MO",
-      "value": 4.0,
-      "period": "2026-09-10"
-    },
-    "us3MonthTBill": {
-      "seriesId": "DTB3",
-      "value": 3.86,
-      "period": "2026-09-10"
-    },
-    "usInflationExpectation10Y": {
-      "seriesId": "T10YIE",
-      "value": 2.36,
-      "period": "2026-09-11"
-    },
-    "fedFundsRate": {
-      "seriesId": "FEDFUNDS",
-      "value": 3.63,
-      "period": "2026-08-01"
-    },
-    "usCoreCpiYoy": {
-      "seriesId": "CPILFESL",
-      "value": 2.4461631786472537,
-      "period": "2026-08-01",
-      "calculation": "year_over_year_percent"
-    }
-  },
+  "usageNotice": "Only reviewed World Bank indicators and SEC ticker metadata. No direct IMF or FRED observations. Verify source terms and observation dates. Repackaging does not refresh observations.",
   "worldBank": {
     "MX": {
       "gdpUsdCurrent": {
@@ -206,7 +171,6 @@
       }
     }
   },
-  "imf": {},
   "edgar": {
     "tickerCount": 10426,
     "topTickers": [
@@ -2711,5 +2675,6 @@
         "title": "Ingersoll Rand Inc."
       }
     ]
-  }
+  },
+  "kind": "public_data_feeds"
 }

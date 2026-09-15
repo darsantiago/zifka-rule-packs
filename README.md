@@ -1,87 +1,41 @@
 # Zifka — Signed Public Data Packs
 
-Serverless, signed, license-clean data feed for the
-[Zifka Valuation Suite](https://github.com/darsantiago/zifka-valuation-studio)
-apps. Nothing here is a proprietary API — everything is a re-serve of a
-public source, packaged for the app to consume with a single HTTP GET
-and a single Ed25519 signature check.
+## Current Valuation Suite feed scope (2026-09-15)
 
-## What's inside
+`data_feeds.json` includes only five reviewed World Bank indicators for six
+markets and SEC ticker metadata. Direct FRED and IMF observations are excluded,
+including when credentials or an old environment flag exist. The weekly
+publisher has the same scope. A signature proves authenticity, not permissions,
+freshness, accuracy or professional approval.
 
-| File | Contents | Refresh |
-|---|---|---|
-| `rule_packs.json` | Regulatory compliance packs (US retirement / NAIC / Colombia DIAN / Colombia pensions / …). Each pack lists authority, review date, validity window. | Manual on regulatory change |
-| `valuation_pack.json` | Valuation reference constants — country risk premiums (77 countries), mature-market Rf & ERP, size-premium bands, industry-premium hints. | Bi-annual (Damodaran Jan / Jul) |
-| `data_feeds.json` | Public macro feeds: US Treasury yields (FRED), core CPI, World Bank GDP / inflation / unemployment / govt debt for the 6 priority EM markets, IMF WEO growth forecast, SEC EDGAR company tickers index. | **Weekly (GitHub Action)** |
-| `*.sig` | Detached Ed25519 signature for each pack. Base64-encoded. | Automatic |
+The public feed was repackaged as version 9 from the signed September 14 baseline.
+Observation periods and publishedAt are preserved: repackaging is not a refresh.
+Source and licensing evidence is maintained in the app's
+[scoped review](https://github.com/darsantiago/zifka-valuation-studio/blob/main/docs/rights/public-data-scope.md).
+Third-party data remains subject to its own terms; repository licensing cannot
+override rights already granted by a source.
 
-## Verifying a pack
+`valuation_pack.json` is a legacy, unreviewed reference dataset, not consumed by
+Valuation Suite 14231. No blanket rights clearance is claimed for other payloads
+or historical commits in this repository. Regulatory packs are separate.
 
-The app runs this check on every load; you can reproduce it in the
-shell of any Dart / Node / Python / OpenSSL environment. The public
-key that verifies every pack is baked into the app at
-`lib/core/services/signed_rule_pack_service.dart:publicKeyHex` and
-matches:
+## Refresh and sign
 
-```
-adc008715d83d3774236508c3d592c3eacc0ce6a2f3e05facea40bee334052e5
-```
-
-A tampered payload or signature causes the app to discard the pack and
-keep whatever it had cached locally.
-
-## Publishing an update
-
-Automatic:
-
-```
-# Weekly cron in .github/workflows/refresh-feeds.yml. No manual step.
-```
-
-Manual (a regulatory change, a Damodaran vintage update):
+The weekly workflow tests the producer before refreshing World Bank/SEC data,
+then signs using the existing private identity stored outside this repository.
+The next successfully refreshed version is strictly greater than the current one.
 
 ```
 cd tool
 dart pub get
+dart test
 dart run bin/refresh_feeds.dart ../data_feeds.json
-dart run bin/sign_pack.dart <path/to/ed25519_private.key> ../data_feeds.json
-cd ..
-git commit -am "feat(feeds): refresh $(date -u +%Y-%m-%d)"
-git push
+dart run bin/sign_pack.dart <existing-private-key-path> ../data_feeds.json
 ```
 
-The private key lives outside this repository (see
-`zifka-keystores` for the secrets store on maintainer devices,
-and `ED25519_PRIVATE_KEY_B64` in GitHub Actions Secrets for CI).
+The public verification identity is pinned in `tool/test/feed_scope_test.dart`
+and in the app's `SignedRulePackService.publicKeyHex`.
 
-## Sources & attribution
-
-Each pack carries an `attribution` field naming the upstream source
-and its licence. In summary:
-
-- **FRED** — Federal Reserve Bank of St Louis. US federal government
-  output; public domain in the United States.
-- **World Bank Open Data** — Creative Commons Attribution 4.0
-  International. We list the indicator code so downstream consumers
-  can re-verify.
-- **IMF DataMapper API** — IMF terms; re-served here under fair-use
-  with attribution.
-- **SEC EDGAR** — SEC public filings; public domain.
-- **Damodaran** (in `valuation_pack.json`) — reformatted from the NYU
-  Stern country-risk workbook, which Damodaran publishes for
-  educational and informational use.
-- **Kroll Cost of Capital handbook framework** (in `valuation_pack.json`) —
-  size-premium *bands* are our own bands built to model the SAME
-  dimensions; the Handbook's proprietary decile figures are NOT
-  reproduced here.
-
-## License
-
-See [LICENSE.md](LICENSE.md) — Business Source License 1.1. TL;DR: the
-Additional Use Grant allows anyone to consume the packs when running
-the official Zifka Valuation Suite apps; every other use (redistribution,
-embedding in another app, offering as a service) needs a separate
-commercial license. Each pack rolls into Apache 2.0 four years after its
-publication date.
-
-For commercial use before the Change Date, contact `darsantiago@gmail.com`.
+No private key belongs in a commit. Clients verify both the signature and their
+own source allowlist, and retain a valid scoped baseline on failure.
+Contact: info@sari-ai.com.
